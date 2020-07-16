@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const axiosInstance = axios.create({
-  baseURL: 'http://192.168.18.9:3000/'
+  baseURL: 'http://0dc1a04889bc.ngrok.io/'
 })
 export default async ({ Vue }) => {
   Vue.prototype.$axios = axiosInstance
