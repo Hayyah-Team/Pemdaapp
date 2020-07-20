@@ -7,18 +7,45 @@
           @reset="onReset"
           @submit="onSubmit"
           class="q-mt-lg"
-        >
-        <div class="q-gutter-md">
-          <q-input label="Tag" v-model="tag" filled  :rules="[ val => val && val.length > 0 || 'Insert Your Time']"></q-input>
-          <q-input label="Judul Berita" v-model="judul" filled :rules="[ val => val && val.length > 0 || 'Insert Your Judul']"></q-input>
+          >
+          <div class="q-pa-md">
+          <q-select filled v-model="form.tag" :options="options" label="Tag"/>
+          <br>
+
+          <q-input
+            filled
+            v-model="form.judul"
+            label="Judul"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+
           <q-editor
             filled
             autogrow
-            v-model="isi"
+            v-model="form.isi"
             min-height="5rem" />
-          <q-btn label="Update" type="submit" color="light-blue-12" unelevated></q-btn>
-          <q-btn label="Reset" type="reset" color="light-blue-12" flat unelevated></q-btn>
+          <br>
+
+          <q-file color="teal" filled v-model="image" label="Image">
+            <template v-slot:prepend>
+              <q-icon name="filter" />
+            </template>
+          </q-file>
+          <br>
+
+          <q-file color="teal" filled v-model="file" label="File">
+            <template v-slot:prepend>
+              <q-icon name="cloud_upload" />
+            </template>
+          </q-file>
+          <br>
+
         </div>
+          <div>
+            <q-btn label="Submit" type="submit" color="primary"/>
+            <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+          </div>
         </q-form>
       </q-card-section>
     </q-card>
@@ -28,9 +55,22 @@
 export default {
   data () {
     return {
-      tag: null,
-      judul: null,
-      isi: null
+      form: {
+        tag: null,
+        judul: null,
+        isi: ''
+      },
+      options: [
+        'Risalah rapat persidangan',
+        'Propemperda',
+        'Raperda naskah akademik',
+        'Rancangan Perda pembahasan',
+        'Produk hukum DPRD',
+        'Kegiatan hukum',
+        'Berita Dewan'
+      ],
+      image: null,
+      file: null
     }
   },
   created () {
@@ -39,12 +79,10 @@ export default {
   methods: {
     getData () {
       console.log(this.$route.params.id)
-      this.$axios.get('berita/tampilsingle/' + this.$route.params.id)
+      this.$axios.get('data/data/' + this.$route.params.id)
         .then(res => {
-          const data = res.data
-          this.tag = data.tag
-          this.judul = data.judul
-          this.isi = data.isi
+          console.log(res)
+          this.form = res.data
         })
     },
     onReset () {
@@ -53,26 +91,28 @@ export default {
       this.isi = null
     },
     onSubmit () {
-      this.$axios.put('berita/edit/' + this.$route.params.id, {
-        waktu: this.waktu,
-        judul: this.judul,
-        isi: this.isi
-      }).then(res => {
-        if (res.data.sukses) {
-          this.$q.notify({
-            type: 'positive',
-            message: res.data.pesan,
-            position: 'top'
-          })
-          this.$router.push({ name: 'data' })
-        } else {
-          this.$q.notify({
-            type: 'negative',
-            message: res.data.pesan,
-            position: 'top'
-          })
-        }
-      })
+      const formData = new FormData()
+      formData.append('image', this.image)
+      formData.append('file', this.file)
+      formData.append('data', JSON.stringify(this.form))
+      this.$axios.post('data/data/' + this.$route.params.id, formData)
+        .then(res => {
+          console.log(res)
+          if (res.data.sukses) {
+            this.$q.notify({
+              type: 'positive',
+              message: res.data.message,
+              position: 'top'
+            })
+            this.$router.push({ name: 'data' })
+          } else {
+            this.$q.notify({
+              type: 'negative',
+              message: res.data.message,
+              position: 'top'
+            })
+          }
+        })
     }
   }
 }

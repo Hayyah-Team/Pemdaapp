@@ -13,6 +13,7 @@ Vue.use(Vuex)
  * async/await or return a Promise which resolves
  * with the Store instance.
  */
+Vue.prototype.$baseImageURL = 'http://localhost:3000/uploads/folderimage'
 
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({

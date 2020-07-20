@@ -82,7 +82,7 @@ export default {
         {
           label: 'Data Berita',
           icon: 'assessment',
-          to: '/data',
+          to: '/home',
           leftDrawerOpen: false
         },
         {

@@ -5,12 +5,12 @@
       class="q-gutter-md"
     >
     <div class="q-pa-md">
-      <q-select filled v-model="tag" :options="options" label="Tag"/>
+      <q-select filled v-model="form.tag" :options="options" label="Tag"/>
       <br>
 
       <q-input
         filled
-        v-model="judul"
+        v-model="form.judul"
         label="Judul"
         lazy-rules
         :rules="[ val => val && val.length > 0 || 'Please type something']"
@@ -19,7 +19,7 @@
       <q-editor
         filled
         autogrow
-        v-model="isi"
+        v-model="form.isi"
         min-height="5rem" />
       <br>
 
@@ -49,9 +49,11 @@
 export default {
   data () {
     return {
-      tag: null,
-      judul: null,
-      isi: '',
+      form: {
+        tag: null,
+        judul: null,
+        isi: ''
+      },
       options: [
         'Risalah rapat persidangan',
         'Propemperda',
@@ -73,26 +75,48 @@ export default {
       this.isi = null
     },
     onSubmit () {
-      this.$axios.post('berita/input', {
-        tag: this.tag,
-        judul: this.judul,
-        isi: this.isi
-      }).then(res => {
-        if (res.data.sukses) {
-          this.$q.notify({
-            type: 'positive',
-            message: res.data.pesan,
-            position: 'top'
-          })
-          this.$router.push({ name: 'data' })
-        } else {
-          this.$q.notify({
-            type: 'negative',
-            message: res.data.pesan,
-            position: 'top'
-          })
-        }
-      })
+      const formData = new FormData()
+      formData.append('image', this.image)
+      formData.append('file', this.file)
+      formData.append('data', JSON.stringify(this.form))
+      this.$axios.post('data/data', formData)
+        .then(res => {
+          console.log(res)
+          if (res.data.sukses) {
+            this.$q.notify({
+              type: 'positive',
+              message: res.data.message,
+              position: 'top'
+            })
+            this.$router.push({ name: 'data' })
+          } else {
+            this.$q.notify({
+              type: 'negative',
+              message: res.data.message,
+              position: 'top'
+            })
+          }
+        })
+      // this.$axios.post('data/data', {
+      //   tag: this.tag,
+      //   judul: this.judul,
+      //   isi: this.isi
+      // }).then(res => {
+      //   if (res.data.sukses) {
+      //     this.$q.notify({
+      //       type: 'positive',
+      //       message: res.data.pesan,
+      //       position: 'top'
+      //     })
+      //     this.$router.push({ name: 'data' })
+      //   } else {
+      //     this.$q.notify({
+      //       type: 'negative',
+      //       message: res.data.pesan,
+      //       position: 'top'
+      //     })
+      //   }
+      // })
     }
   }
 }
